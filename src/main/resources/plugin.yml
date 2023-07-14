@@ -1,0 +1,6 @@
+name: TDailyGift
+version: '${version}'
+main: com.teger.tdailygift.TDailyGift
+api-version: 1.20
+authors: [ KTeger ]
+website: https://github.com/jy2694
