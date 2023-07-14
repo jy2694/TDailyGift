@@ -1,0 +1,3 @@
+welcome-message:
+  enable: true
+  message: 'You can get a daily gift now! Enter the "/daily" command and take it!'

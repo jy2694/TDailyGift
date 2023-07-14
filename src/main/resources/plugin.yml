@@ -4,3 +4,17 @@ main: com.teger.tdailygift.TDailyGift
 api-version: 1.20
 authors: [ KTeger ]
 website: https://github.com/jy2694
+commands:
+  daily:
+    description: Opens the inventory where you can receive the daily gifts.
+    permission: dailygift.open
+  dailyedit:
+    description: Opens the inventory where you can modify daily gifts entries.
+    permission: dailygift.edit
+permissions:
+  dailygift.open:
+    description: Permission for the /daily command. By default, it is granted to all players.
+    default: true
+  dailygift.edit:
+    description: Permission for the /dailyedit command. By default, it is only granted to the administrator players.
+    default: op
