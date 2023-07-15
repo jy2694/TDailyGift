@@ -1,5 +1,6 @@
 package com.teger.tdailygift.inventory;
 
+import com.teger.tdailygift.MessageType;
 import com.teger.tdailygift.TDailyGift;
 import com.teger.tdailygift.configuration.PlayerData;
 import org.bukkit.Bukkit;
@@ -22,7 +23,7 @@ public class DailyGiftInventory {
         Inventory inv = Bukkit.createInventory(null, 9*6, "[Daily Gift]");
 
         setBorder(inv);
-        setGifts(inv);
+        setGifts(inv, player);
         setReceivedGifts(inv, player);
 
         return inv;
@@ -31,7 +32,7 @@ public class DailyGiftInventory {
     private static void setBorder(Inventory inv){
         ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta meta = item.getItemMeta();
-        Objects.requireNonNull(meta).setDisplayName("");
+        Objects.requireNonNull(meta).setDisplayName(ChatColor.WHITE+" ");
         item.setItemMeta(meta);
         for(int i = 0; i < 9; i ++) inv.setItem(i, item);
         for(int i = 9; i < 54; i += 9) inv.setItem(i, item);
@@ -46,14 +47,16 @@ public class DailyGiftInventory {
         inv.setItem(4, receive);
     }
 
-    private static void setGifts(Inventory inv){
+    private static void setGifts(Inventory inv, Player player){
+        PlayerData data = TDailyGift.getPlayerDataManager().getPlayerDataMap().get(player.getUniqueId());
+        int count = data == null ? 0 : data.getCount();
         for(int i = 1; i <= 28; i ++){
             int slot = mapToSlot(i);
             ItemStack item = TDailyGift.getGiftDataManager().getGifts().get(i);
             if(item == null) {
                 item = new ItemStack(Material.BOOK);
                 ItemMeta noneMeta = item.getItemMeta();
-                Objects.requireNonNull(noneMeta).setDisplayName(ChatColor.WHITE + "No daily gifts.");
+                Objects.requireNonNull(noneMeta).setDisplayName(TDailyGift.messages.get(MessageType.NO_DAILY_GIFT));
                 item.setItemMeta(noneMeta);
             }
             else item = item.clone();
@@ -62,8 +65,12 @@ public class DailyGiftInventory {
             if(lore == null) {
                 lore = new ArrayList<>();
             }
-            lore.add(ChatColor.GRAY + "===================");
-            lore.add(ChatColor.GRAY + "Day "+i+" can be received.");
+            lore.add(TDailyGift.messages.get(MessageType.DATE_DISPLAY_ITEM_SEPARATOR));
+            if (i <= count) {
+                lore.add(TDailyGift.messages.get(MessageType.RECEIVED_DISPLAY_ITEM));
+            } else {
+                lore.add(String.format(TDailyGift.messages.get(MessageType.DATE_DISPLAY_ITEM), i));
+            }
             meta.setLore(lore);
             meta.addItemFlags(ItemFlag.values());
             item.setItemMeta(meta);

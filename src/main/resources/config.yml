@@ -1,3 +1,15 @@
+# Whether to display a message if a player who can get a daily gift joins the server.
 welcome-message:
   enable: true
-  message: 'You can get a daily gift now! Enter the "/daily" command and take it!'
+  message: '&bYou can get a daily gift now! Enter the "/daily" command and take it!'
+
+# Phrases to be displayed in the game.
+message-lang:
+  already-get-today: '&aYou already got the today daily gift.'
+  already-get-month: '&aYou already got all the daily gifts for this month.'
+  inventory-full: '&cInventory is full. Please empty your inventory and get the gift.'
+  get-daily-gift: '&a&lGet Daily Gift'
+  date-display-item-separator: '&7==================='
+  date-display-item: '&7Day %s can be received.'
+  received-display-item: '&7Received.'
+  no-daily-gift: '&fNo daily gift.'

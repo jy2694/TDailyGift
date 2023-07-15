@@ -1,9 +1,9 @@
 package com.teger.tdailygift.event;
 
+import com.teger.tdailygift.MessageType;
 import com.teger.tdailygift.TDailyGift;
 import com.teger.tdailygift.configuration.PlayerData;
 import com.teger.tdailygift.inventory.DailyGiftInventory;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -12,7 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -63,15 +62,11 @@ public class EventManager implements Listener {
         if(data == null) return;
         if(data.getNowOpen() == null) return;
         if(data.getNowOpen().equalsIgnoreCase("dailyedit")){
-            ItemStack[] previousContents = TDailyGift.getGiftDataManager().getGiftsToArray();
-            if(!compareInventoryContents(e.getInventory(), previousContents)) {
-                for(int i = 1; i <= 28; i ++){
-                    int slot = mapToSlot(i);
-                    ItemStack item = e.getInventory().getItem(slot);
-                    if(item == null) TDailyGift.getGiftDataManager().getGifts().remove(i);
-                    else TDailyGift.getGiftDataManager().getGifts().put(i, item);
-                    player.sendMessage(ChatColor.GREEN + "The Daily Gift entry has been modified.");
-                }
+            for(int i = 1; i <= 28; i ++){
+                int slot = mapToSlot(i);
+                ItemStack item = e.getInventory().getItem(slot);
+                if(item == null) TDailyGift.getGiftDataManager().getGifts().remove(i);
+                else TDailyGift.getGiftDataManager().getGifts().put(i, item);
             }
         }
         data.setNowOpen(null);
@@ -107,12 +102,12 @@ public class EventManager implements Listener {
     private void tryReceiveGift(Player player, PlayerData data, int slot){
         if(slot == RECEIVE_SLOT){
             if(!data.todayCanReceive()){
-                player.sendMessage(ChatColor.GREEN + "You already got the today daily gift.");
+                player.sendMessage(TDailyGift.messages.get(MessageType.ALREADY_GET_TODAY));
                 return;
             }
             int enableSlot = mapToSlot(data.getCount() + 1);
             if(isBorder(enableSlot)) {
-                player.sendMessage(ChatColor.GREEN + "You already got all the daily gifts for this month.");
+                player.sendMessage(TDailyGift.messages.get(MessageType.ALREADY_GET_MONTH));
                 return;
             }
             if(receiveGift(player, data.getCount()+1)){
@@ -123,16 +118,16 @@ public class EventManager implements Listener {
                 data.setNowOpen("daily");
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             } else {
-                player.sendMessage(ChatColor.RED + "Inventory is full. Please empty your inventory and get the gift.");
+                player.sendMessage(TDailyGift.messages.get(MessageType.INVENTORY_FULL));
             }
         } else if(!isBorder(slot)) {
             if(!data.todayCanReceive()){
-                player.sendMessage(ChatColor.GREEN + "You already got the today daily gift.");
+                player.sendMessage(TDailyGift.messages.get(MessageType.ALREADY_GET_TODAY));
                 return;
             }
             int enableSlot = mapToSlot(data.getCount() + 1);
             if(isBorder(enableSlot)) {
-                player.sendMessage(ChatColor.GREEN + "You already got all the daily gifts for this month.");
+                player.sendMessage(TDailyGift.messages.get(MessageType.ALREADY_GET_MONTH));
                 return;
             }
             if(slot == enableSlot){
@@ -144,7 +139,7 @@ public class EventManager implements Listener {
                     data.setNowOpen("daily");
                     player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
                 } else {
-                    player.sendMessage(ChatColor.RED + "Inventory is full. Please empty your inventory and get the gift.");
+                    player.sendMessage(TDailyGift.messages.get(MessageType.INVENTORY_FULL));
                 }
             }
         }
@@ -155,15 +150,6 @@ public class EventManager implements Listener {
         if(item == null) return true;
         if(!canStackable(player.getInventory(), item)) return false;
         player.getInventory().addItem(item);
-        return true;
-    }
-
-    private boolean compareInventoryContents(Inventory inv, ItemStack[] items){
-        for(int i = 1; i <= 28; i ++){
-            ItemStack item1 = inv.getItem(mapToSlot(i));
-            ItemStack item2 = items[i];
-            if(item1 != item2) return false;
-        }
         return true;
     }
 }
