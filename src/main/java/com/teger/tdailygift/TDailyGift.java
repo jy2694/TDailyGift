@@ -1,21 +1,24 @@
 package com.teger.tdailygift;
 
 import com.teger.tdailygift.command.CommandManager;
+import com.teger.tdailygift.configuration.GiftDataManager;
+import com.teger.tdailygift.configuration.PlayerDataManager;
 import com.teger.tdailygift.event.EventManager;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public final class TDailyGift extends JavaPlugin {
 
-//    private static Logger logger = Bukkit.getLogger();
-    private static String welcomeMessage = null;
+    private static final Logger logger = Bukkit.getLogger();
+    private String welcomeMessage = null;
     private static PlayerDataManager playerDataManager;
+    private static GiftDataManager giftDataManager;
 
     @Override
     public void onEnable() {
@@ -30,8 +33,11 @@ public final class TDailyGift extends JavaPlugin {
         loadSettingConfiguration();
         try {
             playerDataManager = new PlayerDataManager(this);
+            giftDataManager = new GiftDataManager(this);
             playerDataManager.loadPlayerData();
+            giftDataManager.loadGiftData();
         } catch (IOException | ParseException e) {
+            logger.warning("An error occurred loading the configuration file.");
             Bukkit.getPluginManager().disablePlugin(this);
         }
     }
@@ -41,13 +47,14 @@ public final class TDailyGift extends JavaPlugin {
         /* Configuration Save */
         try {
             playerDataManager.savePlayerData();
+            giftDataManager.saveGiftData();
         } catch (IOException e) {
-            //Exception
+            logger.warning("The configuration file has not been saved.");
         }
     }
 
     private void registerEvents(){
-        EventManager eventManager = new EventManager();
+        EventManager eventManager = new EventManager(this);
         Bukkit.getPluginManager().registerEvents(eventManager, this);
     }
 
@@ -65,7 +72,15 @@ public final class TDailyGift extends JavaPlugin {
         }
     }
 
-    public static String getWelcomeMessage() {
+    public String getWelcomeMessage() {
         return welcomeMessage;
+    }
+
+    public static PlayerDataManager getPlayerDataManager() {
+        return playerDataManager;
+    }
+
+    public static GiftDataManager getGiftDataManager() {
+        return giftDataManager;
     }
 }

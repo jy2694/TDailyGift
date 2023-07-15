@@ -1,18 +1,19 @@
-package com.teger.tdailygift;
+package com.teger.tdailygift.configuration;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-class PlayerData {
+public class PlayerData {
     private final UUID uniqueId;
     private Date lastReceived;
     private int count;
+    private String nowOpen;
 
     public PlayerData(PlayerDataBuilder builder) {
-        this.uniqueId = builder.uniqueId;
-        this.lastReceived = builder.lastReceived;
-        this.count = builder.count;
+        this.uniqueId = builder.getUniqueId();
+        this.lastReceived = builder.getLastReceived();
+        this.count = builder.getCount();
     }
 
     public void setLastReceived(Date lastReceived) {
@@ -32,13 +33,28 @@ class PlayerData {
     }
 
     public int getCount() {
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        Calendar last = Calendar.getInstance();
+        last.setTime(lastReceived);
+        if(now.get(Calendar.YEAR) != last.get(Calendar.YEAR)) count = 0;
+        else if(now.get(Calendar.MONTH) != last.get(Calendar.MONTH)) count = 0;
         return count;
+    }
+
+    public String getNowOpen() {
+        return nowOpen;
+    }
+
+    public void setNowOpen(String nowOpen) {
+        this.nowOpen = nowOpen;
     }
 
     public boolean todayCanReceive(){
         Date today = new Date();
         long betweenTime = today.getTime() - lastReceived.getTime();
         long days = (betweenTime / (24 * 60 * 60 * 1000L)) % 365;
+        System.out.println("day between : "+ days);
         return days > 0;
     }
 
@@ -46,28 +62,7 @@ class PlayerData {
         return new PlayerDataBuilder();
     }
 
-    static class PlayerDataBuilder{
-        private UUID uniqueId;
-        private Date lastReceived = new Date(1970, Calendar.JANUARY, 1);
-        private int count;
-
-        public PlayerDataBuilder uniqueId(UUID uniqueId){
-            this.uniqueId = uniqueId;
-            return this;
-        }
-
-        public PlayerDataBuilder lastReceived(Date lastReceived){
-            this.lastReceived = lastReceived;
-            return this;
-        }
-
-        public PlayerDataBuilder count(int count){
-            this.count = count;
-            return this;
-        }
-
-        public PlayerData build(){
-            return new PlayerData(this);
-        }
+    public static PlayerDataBuilder emptyBuilder(UUID uniqueId){
+        return new PlayerDataBuilder().uniqueId(uniqueId).count(0);
     }
 }

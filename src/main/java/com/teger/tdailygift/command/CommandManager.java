@@ -1,36 +1,54 @@
 package com.teger.tdailygift.command;
 
+import com.teger.tdailygift.TDailyGift;
+import com.teger.tdailygift.configuration.PlayerData;
 import com.teger.tdailygift.inventory.DailyGiftEditInventory;
 import com.teger.tdailygift.inventory.DailyGiftInventory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 public class CommandManager implements CommandExecutor {
+    
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(command.getName().equalsIgnoreCase("daily")){
-            return dailyCommand(sender);
+            dailyCommand(sender);
+            return false;
         }
         else if(command.getName().equalsIgnoreCase("dailyEdit")){
-            return dailyEditCommand(sender);
+            dailyEditCommand(sender);
+            return false;
         }
         return false;
     }
 
-    private boolean dailyCommand(CommandSender sender){
-        if(isNotPlayer(sender)) return false;
+    private void dailyCommand(CommandSender sender){
+        if(isNotPlayer(sender)) return;
         Player player = (Player) sender;
-        player.openInventory(DailyGiftInventory.getInventory(player));
-        return false;
+        Inventory inv = DailyGiftInventory.getInventory(player);
+        player.openInventory(inv);
+        PlayerData data = TDailyGift.getPlayerDataManager().getPlayerDataMap().get(player.getUniqueId());
+        if(data == null){
+            data = PlayerData.emptyBuilder(player.getUniqueId()).build();
+            TDailyGift.getPlayerDataManager().getPlayerDataMap().put(player.getUniqueId(), data);
+        }
+        data.setNowOpen("daily");
     }
 
-    private boolean dailyEditCommand(CommandSender sender){
-        if(isNotPlayer(sender)) return false;
+    private void dailyEditCommand(CommandSender sender){
+        if(isNotPlayer(sender)) return;
         Player player = (Player) sender;
-        player.openInventory(DailyGiftEditInventory.getInventory(player));
-        return false;
+        Inventory inv = DailyGiftEditInventory.getInventory();
+        player.openInventory(inv);
+        PlayerData data = TDailyGift.getPlayerDataManager().getPlayerDataMap().get(player.getUniqueId());
+        if(data == null){
+            data = PlayerData.emptyBuilder(player.getUniqueId()).build();
+            TDailyGift.getPlayerDataManager().getPlayerDataMap().put(player.getUniqueId(), data);
+        }
+        data.setNowOpen("dailyedit");
     }
 
     private boolean isNotPlayer(CommandSender sender){

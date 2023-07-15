@@ -1,5 +1,6 @@
-package com.teger.tdailygift;
+package com.teger.tdailygift.configuration;
 
+import com.teger.tdailygift.TDailyGift;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -16,7 +17,7 @@ public class PlayerDataManager {
 
     private final File file;
     private FileConfiguration config;
-    private Map<UUID, PlayerData> playerDataMap = new HashMap<>();
+    private final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
 
     public PlayerDataManager(TDailyGift plugin) throws IOException {
         this.file = new File(String.format("plugins/%s/player.yml", plugin.getDescription().getName()));
@@ -27,7 +28,7 @@ public class PlayerDataManager {
 
     public void loadPlayerData() throws ParseException {
         config = YamlConfiguration.loadConfiguration(this.file);
-        HashMap<UUID, PlayerData> data = new HashMap<>();
+        playerDataMap.clear();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         for(String key : config.getKeys(false)){
             UUID uuid = UUID.fromString(key);
@@ -38,15 +39,14 @@ public class PlayerDataManager {
                     .lastReceived(date)
                     .count(count)
                     .build();
-            data.put(uuid, playerData);
+            playerDataMap.put(uuid, playerData);
         }
-        playerDataMap = data;
     }
 
     public void savePlayerData() throws IOException {
-        if(config == null) return;
+        if (config == null) return;
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        for(UUID uuid : playerDataMap.keySet()){
+        for (UUID uuid : playerDataMap.keySet()) {
             PlayerData data = playerDataMap.get(uuid);
             String key = uuid.toString();
             String lastReceived = format.format(data.getLastReceived());

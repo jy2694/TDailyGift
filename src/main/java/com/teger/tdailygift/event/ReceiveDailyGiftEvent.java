@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 public class ReceiveDailyGiftEvent extends Event {
 
     private static final HandlerList handlerList = new HandlerList();
-    private Player player;
-    private int date;
-    private ItemStack item;
+    private final Player player;
+    private final int date;
+    private final ItemStack item;
 
     public ReceiveDailyGiftEvent(Player player, int date, ItemStack item){
         this.player = player;
